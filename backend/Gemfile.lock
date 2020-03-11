@@ -39,8 +39,8 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (8.0.0)
+    bcrypt (3.1.13)
     builder (3.2.4)
-    byebug (10.0.2)
     concurrent-ruby (1.1.6)
     crass (1.0.6)
     erubi (1.9.0)
@@ -48,6 +48,7 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
+    jwt (2.2.1)
     loofah (2.4.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -110,7 +111,8 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  byebug
+  bcrypt (~> 3.1.13)
+  jwt (~> 2.2.1)
   mysql2 (>= 0.3.18, < 0.6.0)
   puma (~> 3.7)
   rails (~> 5.1.7)
