@@ -3,4 +3,6 @@ Rails.application.routes.draw do
 
   post '/authentication/register', to: 'authentication#register'
   post '/authentication/login', to: 'authentication#login'
+
+  resources :categories, only: [:index, :show, :create, :update, :destroy]
 end
