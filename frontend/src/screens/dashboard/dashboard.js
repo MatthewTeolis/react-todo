@@ -9,15 +9,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export function Dashboard() {
+export function Dashboard(props) {
   const classes = useStyles();
-  const [auth, setAuth] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
-  const handleChange = event => {
-    setAuth(event.target.checked);
-  };
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -45,7 +40,15 @@ export function Dashboard() {
           <Typography variant="h6" className={classes.title}>
             React Todo
           </Typography>
-          {auth && <Button color="inherit">Logout</Button>}
+          <Button
+            color="inherit"
+            onClick={() => {
+              localStorage.removeItem("token");
+              props.history.push("/");
+            }}
+          >
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer open={open} onClose={handleClose}>

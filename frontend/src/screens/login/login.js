@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Box, Paper, Button, styled, OutlinedInput, InputLabel, FormControl, Typography } from "@material-ui/core";
 import "./login.css";
 import { Link } from "react-router-dom";
+import { Api } from "../../services/api";
 
 let NoStyleLink = styled(Link)({
   textDecoration: "none",
   color: "inherit"
 });
 
-export function Login() {
+export function Login(props) {
   const [state, setState] = useState({
     email: "",
     password: ""
@@ -16,6 +17,15 @@ export function Login() {
 
   const handleChange = prop => event => {
     setState({ ...state, [prop]: event.target.value });
+  };
+
+  const login = () => {
+    Api.login(state.email, state.password).then(response => {
+      if (response.status === 200) {
+        props.updateToken(response.data.token);
+        props.history.push("/");
+      }
+    });
   };
 
   return (
@@ -37,7 +47,7 @@ export function Login() {
           <Button variant="outlined" color="primary">
             <NoStyleLink to="/register">Register</NoStyleLink>
           </Button>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={login}>
             Login
           </Button>
         </Box>
