@@ -2,7 +2,7 @@ class AuthenticationController < ApplicationController
 
   def register
     unless validate_register_model
-      render json: { error: "invalid params" }
+      render json: { error: "invalid params" }, status: :bad_request
       return
     end
 
@@ -17,7 +17,7 @@ class AuthenticationController < ApplicationController
 
   def login
     unless validate_login_model
-      render json: { error: "invalid params" }
+      render json: { error: "invalid params" }, status: :bad_request
       return
     end
 
@@ -34,7 +34,7 @@ class AuthenticationController < ApplicationController
   private
 
   def validate_register_model
-    !(params[:email].nil? or params[:firstName].nil? or params[:lastName].nil? or params[:password].nil?)
+    !(params[:email].blank? or params[:firstName].blank? or params[:lastName].blank? or params[:password].blank?)
   end
 
   def register_params
@@ -42,7 +42,7 @@ class AuthenticationController < ApplicationController
   end
 
   def validate_login_model
-    !(params[:email].nil? or params[:password].nil?)
+    !(params[:email].blank? or params[:password].blank?)
   end
 
   def login_params
