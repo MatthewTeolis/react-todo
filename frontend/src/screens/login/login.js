@@ -23,6 +23,7 @@ export function Login(props) {
     Api.login(state.email, state.password).then(response => {
       if (response.status === 200) {
         props.updateToken(response.data.token);
+        Api.updateToken(response.data.token);
         props.history.push("/");
       }
     });
