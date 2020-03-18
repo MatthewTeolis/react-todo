@@ -1,10 +1,11 @@
 import { AppBar, Toolbar, IconButton, Typography, Button, makeStyles, Drawer, CssBaseline } from "@material-ui/core";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import clsx from "clsx";
 import MenuIcon from "@material-ui/icons/Menu";
 import { SideMenu } from "./sidemenu";
 import { Api } from "../../services/api";
 import { CategoryExpansionPanels } from "./categoryExpansionPanel";
+import { AppContext } from "../../contexts/appContext";
 
 const drawerWidth = 240;
 
@@ -48,12 +49,24 @@ const useStyles = makeStyles(theme => ({
 
 export function Dashboard(props) {
   const classes = useStyles();
+
+  const appContext = useContext(AppContext);
+
   const [open, setOpen] = useState(true);
-  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     Api.getCategories().then(response => {
-      setCategories(response.data);
+      if (response.status === 401) {
+        props.history.push("/login");
+      } else if (response.status === 200) {
+        const unparsed = response.data;
+        unparsed.forEach(c => {
+          c.lists.forEach(l => {
+            l.data = JSON.parse(l.data);
+          });
+        });
+        appContext.setCategories(unparsed);
+      }
     });
   }, []);
 
@@ -104,7 +117,7 @@ export function Dashboard(props) {
         }}
       >
         <div className={classes.drawerHeader} />
-        <SideMenu categories={categories} />
+        <SideMenu />
       </Drawer>
       <main
         className={clsx(classes.content, {
@@ -112,7 +125,7 @@ export function Dashboard(props) {
         })}
       >
         <div className={classes.drawerHeader} />
-        <CategoryExpansionPanels categories={categories} />
+        <CategoryExpansionPanels categories={appContext.categories} className={classes.content} />
       </main>
     </div>
   );

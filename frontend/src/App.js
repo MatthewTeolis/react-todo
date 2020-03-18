@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import { Login } from "./screens/login";
 import { Register } from "./screens/register";
 import { Dashboard } from "./screens/dashboard";
+import { AppContextProvider } from "./contexts/appContext";
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -16,13 +17,21 @@ const updateToken = token => {
   localStorage.setItem("token", token);
 };
 
+const ContextedDashboard = props => {
+  return (
+    <AppContextProvider>
+      <Dashboard {...props} />
+    </AppContextProvider>
+  );
+};
+
 function App() {
   return (
     <Router>
       <Switch>
         <Route path="/login" render={props => <Login updateToken={updateToken} {...props} />} />
         <Route path="/register" render={props => <Register updateToken={updateToken} {...props} />} />
-        <PrivateRoute path="/" exact component={Dashboard} />
+        <PrivateRoute path="/" exact component={ContextedDashboard} />
       </Switch>
     </Router>
   );

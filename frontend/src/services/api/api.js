@@ -21,5 +21,12 @@ export const Api = {
 
   login: (email, password) => api.post("/authentication/login", { email, password }),
 
-  getCategories: () => authApi.get("/categories")
+  getCategories: () => authApi.get("/categories"),
+
+  updateList: (id, title, data) => authApi.put(`/lists/${id}`, { title, data: JSON.stringify(data) }),
+
+  createNewList: (category_id, title, data) =>
+    authApi.post(`/lists`, { category_id, title, data: JSON.stringify(data) }),
+
+  deleteList: id => authApi.delete(`/lists/${id}`)
 };
