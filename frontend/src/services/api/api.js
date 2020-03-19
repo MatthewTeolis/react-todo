@@ -23,7 +23,8 @@ export const Api = {
 
   getCategories: () => authApi.get("/categories"),
 
-  updateList: (id, title, data) => authApi.put(`/lists/${id}`, { title, data: JSON.stringify(data) }),
+  updateList: (id, title, data, category_id) =>
+    authApi.put(`/lists/${id}`, { title, category_id, data: JSON.stringify(data) }),
 
   createNewList: (category_id, title, data) =>
     authApi.post(`/lists`, { category_id, title, data: JSON.stringify(data) }),

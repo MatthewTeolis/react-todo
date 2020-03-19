@@ -8,14 +8,14 @@ import {
   ListItem,
   List as MatList,
   Checkbox,
-  FormControl,
+  TextField,
   Menu,
-  MenuItem,
-  Button
+  MenuItem
 } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Api } from "../../services/api";
 import { AppContext } from "../../contexts/appContext";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,6 +41,13 @@ const useStyles = makeStyles(theme => ({
   },
   footerButtonMargin: {
     marginRight: "8px"
+  },
+  itemComplete: {
+    textDecoration: "line-through",
+    color: "rgba(0, 0, 0, 0.54)"
+  },
+  checked: {
+    color: "rgba(0, 0, 0, 0.54)"
   }
 }));
 
@@ -48,6 +55,9 @@ export function List(props) {
   const appContext = useContext(AppContext);
 
   const list = props.list;
+  if (list.data.length === 0) {
+    list.data = [{ checked: false }];
+  }
 
   const classes = useStyles();
 
@@ -56,7 +66,6 @@ export function List(props) {
   const [title, setTitle] = useState(list.title);
   const [data, setData] = useState(list.data);
 
-  const menuOptions = ["Save", "Delete"];
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -84,9 +93,7 @@ export function List(props) {
     clearTimeout(updateTimeout);
     setUpdateTimeout(
       setTimeout(() => {
-        Api.updateList(list.id, title, data).then(response => {
-          console.log(response);
-        });
+        Api.updateList(list.id, title, data);
       }, 1500)
     );
   };
@@ -132,9 +139,7 @@ export function List(props) {
 
   const handleMenuSave = () => {
     clearTimeout(updateTimeout);
-    Api.updateList(list.id, title, data).then(response => {
-      console.log(response);
-    });
+    Api.updateList(list.id, title, data);
     handleMenuClose();
   };
 
@@ -147,15 +152,28 @@ export function List(props) {
     handleMenuClose();
   };
 
+  const updateCategoryId = (event, category) => {
+    if (category) {
+      Api.updateList(list.id, title, data, category.id).then(response => {
+        if (response.ok) {
+          const responseList = response.data;
+          responseList.data = JSON.parse(responseList.data);
+          appContext.removeList(responseList.id);
+          appContext.addList(responseList);
+        }
+      });
+    }
+  };
+
   return (
     <Paper className={classes.root}>
       <div className={classes.header}>
-        <FormControl variant="outlined">
-          <InputBase className={classes.input} placeholder="Title" multiline value={title} onChange={handleTitle} />
-        </FormControl>
-        <IconButton onClick={handleMenuOpen}>
-          <MoreVertIcon />
-        </IconButton>
+        <InputBase className={classes.input} placeholder="Title" multiline value={title} onChange={handleTitle} />
+        <div>
+          <IconButton onClick={handleMenuOpen}>
+            <MoreVertIcon />
+          </IconButton>
+        </div>
         <Menu
           anchorEl={anchorEl}
           open={menuOpen}
@@ -180,10 +198,12 @@ export function List(props) {
                 disableRipple
                 checked={item.checked || false}
                 onClick={handleCheckbox(index)}
+                classes={{ checked: classes.checked }}
+                color="default"
               />
               <InputBase
                 type="text"
-                className={classes.input}
+                className={(classes.input, item.checked ? classes.itemComplete : "")}
                 placeholder="List item"
                 multiline
                 value={item.value || ""}
@@ -195,13 +215,21 @@ export function List(props) {
           );
         })}
       </MatList>
-      <Box display="flex" className={classes.footer}>
-        <Button variant="outlined" size="small" color="primary" className={classes.footerButtonMargin}>
+      <Box display="flex" className={classes.footer} justifyContent="flex-end">
+        {/* <Button variant="outlined" size="small" color="primary" className={classes.footerButtonMargin}>
           Active
         </Button>
         <Button size="small" className={classes.footerButtonMargin}>
           Completed
-        </Button>
+        </Button> */}
+        <Autocomplete
+          onChange={updateCategoryId}
+          value={props.category}
+          options={appContext.categories}
+          getOptionLabel={option => option.name}
+          style={{ width: 175 }}
+          renderInput={params => <TextField {...params} label="Category" variant="outlined" />}
+        />
       </Box>
     </Paper>
   );

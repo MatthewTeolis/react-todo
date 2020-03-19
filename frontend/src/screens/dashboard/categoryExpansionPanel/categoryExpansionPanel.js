@@ -12,14 +12,15 @@ import {
   InputBase,
   FormControl,
   TextField,
-  Button
+  Button,
+  Grid
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
-import { CardContainer } from "../cardContainer/cardContainer";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { Api } from "../../../services/api";
 import { AppContext } from "../../../contexts/appContext";
+import { List } from "../../../components/List/list";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -37,6 +38,9 @@ const useStyles = makeStyles(theme => ({
   },
   fab: {
     margin: "8px"
+  },
+  gridPadding: {
+    paddingLeft: "12px"
   }
 }));
 
@@ -53,7 +57,13 @@ const CategoryExpansionPanel = props => {
         <Typography className={classes.heading}>{category.name}</Typography>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
-        <CardContainer lists={category.lists} />
+        <Grid container justify="flex-start" spacing={3} className={classes.gridPadding}>
+          {category.lists.map(list => (
+            <Grid key={`list-${list.id}`} item>
+              <List category={category} list={list}></List>
+            </Grid>
+          ))}
+        </Grid>
       </ExpansionPanelDetails>
     </ExpansionPanel>
   );
@@ -87,13 +97,9 @@ export function CategoryExpansionPanels(props) {
   const createNewList = event => {
     Api.createNewList(newList.category_id, newList.title, newList.data).then(response => {
       if (response.status === 201) {
-        appContext.categories.forEach(category => {
-          if (category.id === response.data.category_id) {
-            const responseData = response.data;
-            responseData.data = JSON.parse(responseData.data);
-            category.lists.push(responseData);
-          }
-        });
+        const responseList = response.data;
+        responseList.data = JSON.parse(responseList.data);
+        appContext.addList(responseList);
         handleDialogClose();
       }
     });

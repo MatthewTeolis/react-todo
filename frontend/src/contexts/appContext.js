@@ -14,6 +14,15 @@ export const AppContextProvider = props => {
         category.lists = category.lists.filter(list => list.id !== id);
       });
       setCategories(newCategories);
+    },
+    addList: list => {
+      const newCategories = [...categories];
+      newCategories.forEach(category => {
+        if (category.id === list.category_id) {
+          category.lists.push(list);
+        }
+      });
+      setCategories(newCategories);
     }
   };
 
