@@ -1,7 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { List, ListItem, ListItemIcon, ListItemText, Checkbox, Typography } from "@material-ui/core";
+import { List, ListItem, ListItemIcon, ListItemText, Checkbox, Typography, IconButton } from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
 import { AppContext } from "../../../contexts/appContext";
+import { Api } from "../../../services/api";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -20,40 +22,74 @@ export function SideMenu() {
 
   const appContext = useContext(AppContext);
 
-  const [checked, setChecked] = useState([]);
+  const [allChecked, setAllChecked] = useState(false);
 
-  const handleToggle = value => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  useEffect(() => {
+    let defaultAllCheckedValue = true;
+    appContext.categories.forEach(category => {
+      if (!category.checked) {
+        defaultAllCheckedValue = false;
+      }
+    });
+    setAllChecked(defaultAllCheckedValue);
+  }, [appContext]);
 
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
+  const handleCheckClick = index => event => {
+    appContext.toggleCategoryCheck(index);
+  };
 
-    setChecked(newChecked);
+  const handleAllClicked = event => {
+    const checked = !allChecked;
+    setAllChecked(checked);
+    appContext.setCheckAllCategories(checked);
+  };
+
+  const handleDeleteCategory = category => event => {
+    event.stopPropagation();
+    Api.deleteCategory(category.id).then(response => {
+      if (response.ok) {
+        Api.getCategories().then(res => {
+          const unparsed = res.data;
+          unparsed.forEach(c => {
+            c.checked = true;
+            c.lists.forEach(l => {
+              l.data = JSON.parse(l.data);
+            });
+          });
+          appContext.setCategories(unparsed);
+        });
+      }
+    });
   };
 
   return (
     <>
       <Typography className={classes.drawerTitle}>Categories</Typography>
       <List className={classes.root}>
-        {appContext.categories.map(category => {
+        <ListItem role={undefined} dense button onClick={handleAllClicked}>
+          <ListItemIcon>
+            <Checkbox edge="start" checked={allChecked} tabIndex={-1} disableRipple />
+          </ListItemIcon>
+          <ListItemText primary="All" />
+        </ListItem>
+        {appContext.categories.map((category, index) => {
           const labelId = `checkbox-list-label-${category.id}`;
 
           return (
-            <ListItem key={category.id} role={undefined} dense button onClick={handleToggle(category.id)}>
+            <ListItem key={category.id} role={undefined} dense button onClick={handleCheckClick(index)}>
               <ListItemIcon>
                 <Checkbox
                   edge="start"
-                  checked={checked.indexOf(category.id) !== -1}
+                  checked={category.checked}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{ "aria-labelledby": labelId }}
                 />
               </ListItemIcon>
               <ListItemText id={labelId} primary={category.name} />
+              <IconButton onClick={handleDeleteCategory(category)}>
+                <DeleteIcon />
+              </IconButton>
             </ListItem>
           );
         })}

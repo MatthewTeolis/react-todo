@@ -8,6 +8,18 @@ export const AppContextProvider = props => {
   const context = {
     categories,
     setCategories,
+    toggleCategoryCheck: index => {
+      const newCategories = [...categories];
+      newCategories[index].checked = !newCategories[index].checked;
+      setCategories(newCategories);
+    },
+    setCheckAllCategories: boolean => {
+      const newCategories = [...categories];
+      newCategories.forEach(category => {
+        category.checked = boolean;
+      });
+      setCategories(newCategories);
+    },
     removeList: id => {
       const newCategories = [...categories];
       newCategories.forEach(category => {

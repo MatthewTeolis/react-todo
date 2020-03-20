@@ -23,6 +23,10 @@ export const Api = {
 
   getCategories: () => authApi.get("/categories"),
 
+  createCategory: name => authApi.post("/categories", { name }),
+
+  deleteCategory: id => authApi.delete(`/categories/${id}`),
+
   updateList: (id, title, data, category_id) =>
     authApi.put(`/lists/${id}`, { title, category_id, data: JSON.stringify(data) }),
 

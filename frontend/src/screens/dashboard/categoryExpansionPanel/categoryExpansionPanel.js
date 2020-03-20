@@ -114,9 +114,12 @@ export function CategoryExpansionPanels(props) {
 
   return (
     <div className={classes.root}>
-      {appContext.categories.map(category => (
-        <CategoryExpansionPanel category={category} key={`category-expansion-panel-${category.id}`} />
-      ))}
+      {appContext.categories.map(
+        category =>
+          category.checked && (
+            <CategoryExpansionPanel category={category} key={`category-expansion-panel-${category.id}`} />
+          )
+      )}
       <Box display="flex" justifyContent="flex-end">
         <Fab color="primary" aria-label="add" onClick={handleDialogOpen} className={classes.fab}>
           <AddIcon />

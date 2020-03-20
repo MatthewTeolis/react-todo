@@ -15,7 +15,8 @@ import {
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Api } from "../../services/api";
 import { AppContext } from "../../contexts/appContext";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -152,18 +153,41 @@ export function List(props) {
     handleMenuClose();
   };
 
-  const updateCategoryId = (event, category) => {
+  const updateCategoryId = (event, category, reason) => {
     if (category) {
-      Api.updateList(list.id, title, data, category.id).then(response => {
-        if (response.ok) {
-          const responseList = response.data;
-          responseList.data = JSON.parse(responseList.data);
-          appContext.removeList(responseList.id);
-          appContext.addList(responseList);
-        }
-      });
+      if (category.id) {
+        Api.updateList(list.id, title, data, category.id).then(response => {
+          if (response.ok) {
+            const responseList = response.data;
+            responseList.data = JSON.parse(responseList.data);
+            appContext.removeList(responseList.id);
+            appContext.addList(responseList);
+          }
+        });
+      } else {
+        Api.createCategory(category.inputValue).then(response => {
+          if (response.status === 201) {
+            Api.updateList(list.id, title, data, response.data.id).then(r => {
+              if (r.ok) {
+                Api.getCategories().then(res => {
+                  const unparsed = res.data;
+                  unparsed.forEach(c => {
+                    c.checked = true;
+                    c.lists.forEach(l => {
+                      l.data = JSON.parse(l.data);
+                    });
+                  });
+                  appContext.setCategories(unparsed);
+                });
+              }
+            });
+          }
+        });
+      }
     }
   };
+
+  const filter = createFilterOptions();
 
   return (
     <Paper className={classes.root}>
@@ -203,7 +227,7 @@ export function List(props) {
               />
               <InputBase
                 type="text"
-                className={(classes.input, item.checked ? classes.itemComplete : "")}
+                className={clsx(classes.input, { [classes.itemComplete]: item.checked })}
                 placeholder="List item"
                 multiline
                 value={item.value || ""}
@@ -226,6 +250,18 @@ export function List(props) {
           onChange={updateCategoryId}
           value={props.category}
           options={appContext.categories}
+          filterOptions={(options, params) => {
+            const filtered = filter(options, params);
+
+            if (params.inputValue !== "") {
+              filtered.push({
+                inputValue: params.inputValue,
+                name: `Add "${params.inputValue}"`
+              });
+            }
+
+            return filtered;
+          }}
           getOptionLabel={option => option.name}
           style={{ width: 175 }}
           renderInput={params => <TextField {...params} label="Category" variant="outlined" />}

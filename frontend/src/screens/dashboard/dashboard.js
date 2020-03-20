@@ -61,6 +61,7 @@ export function Dashboard(props) {
       } else if (response.status === 200) {
         const unparsed = response.data;
         unparsed.forEach(c => {
+          c.checked = true;
           c.lists.forEach(l => {
             l.data = JSON.parse(l.data);
           });
@@ -125,7 +126,7 @@ export function Dashboard(props) {
         })}
       >
         <div className={classes.drawerHeader} />
-        <CategoryExpansionPanels categories={appContext.categories} className={classes.content} />
+        <CategoryExpansionPanels className={classes.content} />
       </main>
     </div>
   );
