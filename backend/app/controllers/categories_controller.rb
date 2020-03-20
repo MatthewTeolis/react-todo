@@ -4,9 +4,8 @@ class CategoriesController < ApplicationController
 
   # GET /categories
   def index
-    @categories = Category.where user_id: @current_user&.id
-
-    render json: @categories
+    @categories = Category.includes(:lists).where(user_id: @current_user&.id)
+    render json: @categories, :include => :lists
   end
 
   # GET /categories/:id

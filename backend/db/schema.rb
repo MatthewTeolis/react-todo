@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200314060350) do
+ActiveRecord::Schema.define(version: 20200316034743) do
 
   create_table "categories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
     t.bigint "user_id", null: false
@@ -20,19 +20,12 @@ ActiveRecord::Schema.define(version: 20200314060350) do
     t.index ["user_id", "name"], name: "index_categories_on_user_id_and_name", unique: true
   end
 
-  create_table "list_items", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
-    t.bigint "list_id"
-    t.string "text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["list_id"], name: "fk_rails_12b8df7bb8"
-  end
-
   create_table "lists", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci" do |t|
     t.bigint "category_id", null: false
     t.string "title", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "data"
     t.index ["category_id"], name: "fk_rails_8515e123d3"
   end
 
@@ -46,6 +39,5 @@ ActiveRecord::Schema.define(version: 20200314060350) do
   end
 
   add_foreign_key "categories", "users"
-  add_foreign_key "list_items", "lists"
   add_foreign_key "lists", "categories"
 end

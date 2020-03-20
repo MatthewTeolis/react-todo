@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   post '/authentication/login', to: 'authentication#login'
 
   resources :categories, only: [:index, :show, :create, :update, :destroy]
+  resources :lists, only: [:index, :show, :create, :update, :destroy]
 end

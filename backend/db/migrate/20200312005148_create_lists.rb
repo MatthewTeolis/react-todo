@@ -3,6 +3,7 @@ class CreateLists < ActiveRecord::Migration[5.1]
     create_table :lists do |t|
       t.bigint :category_id, null: false
       t.string :title, null: false
+      t.text :data
 
       t.timestamps
     end
