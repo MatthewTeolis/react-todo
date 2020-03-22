@@ -1,11 +1,13 @@
 import { create } from "apisauce";
 
+const backendHost = process.env.BACKEND_HOST || "localhost";
+
 const api = create({
-  baseURL: "http://localhost:5000"
+  baseURL: `http://${backendHost}:5000`
 });
 
 const authApi = create({
-  baseURL: "http://localhost:5000",
+  baseURL: `http://${backendHost}:5000`,
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`
   }

@@ -1,6 +1,28 @@
 ---
 version: "3.7"
 services:
+  frontend:
+    build: ./frontend
+    image: react-todo-frontend
+    ports:
+      - 3000:80
+    environment:
+      BACKEND_HOST: backend
+
+  backend:
+    build: ./backend
+    image: react-todo-backend
+    ports:
+      - 5000:5000
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      TEST_DATABASE_NAME: ${TEST_DATABASE_NAME}
+    depends_on:
+      - db
+
   db:
     image: mysql:8
     command: --default-authentication-plugin=mysql_native_password
@@ -12,6 +34,7 @@ services:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_USER: ${DATABASE_USER}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      RAILS_ENV: production
     volumes:
       - "db-volume:/var/lib/mysql"
 
