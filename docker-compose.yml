@@ -22,6 +22,7 @@ services:
       TEST_DATABASE_NAME: ${TEST_DATABASE_NAME}
     depends_on:
       - db
+    command: sh -c './wait-for db:3306 -- rails db:migrate && rails s -b 0.0.0.0 -p 5000'
 
   db:
     image: mysql:8
